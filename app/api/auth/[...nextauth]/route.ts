@@ -10,43 +10,69 @@ export const authOptions = {
       name: "Credentials",
       credentials: {
         fullName: { label: "Full Name", type: "text" },
-        phone: { label: "Phone Number", type: "text" }
+        phone: { label: "Phone Number", type: "text" },
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
         console.log("Authorize request received:", { fullName: credentials?.fullName, phone: credentials?.phone });
         
         try {
-          if (!credentials?.fullName || !credentials?.phone) {
-            console.log("Missing credentials");
-            return null;
-          }
-
           await dbConnect();
           console.log("Connected to MongoDB");
 
-          // Passwordless flow: Find or create the user
-          let user = await User.findOne({ phone: credentials.phone });
-          console.log("User lookup result:", user ? "Found" : "Not Found");
-          
-          if (!user) {
-            console.log("Creating new user...");
-            user = await User.create({
-              fullName: credentials.fullName,
-              phone: credentials.phone,
-              role: 'user',
-            });
-            console.log("User created successfully:", user._id);
+          // --- ADMIN LOGIN FLOW (Email + Password) ---
+          if (credentials?.email && credentials?.password) {
+            console.log("Processing Admin Login...");
+            const user = await User.findOne({ email: credentials.email });
+            
+            if (!user) {
+              console.log("Admin not found.");
+              return null;
+            }
+
+            const isValidPassword = await bcrypt.compare(credentials.password, user.password);
+            
+            if (!isValidPassword) {
+              console.log("Invalid admin password.");
+              return null;
+            }
+
+            console.log("Admin authenticated successfully.");
+            return {
+              id: user._id.toString(),
+              name: user.email, // using email as Name for admin
+              role: user.role,
+            };
           }
 
-          const userToReturn = {
-            id: user._id.toString(),
-            name: user.fullName,
-            phone: user.phone,
-            role: user.role,
-          };
-          
-          console.log("Returning user object:", userToReturn.id);
-          return userToReturn;
+          // --- USER PASSWORDLESS FLOW (Name + Phone) ---
+          if (credentials?.fullName && credentials?.phone) {
+            console.log("Processing User Login...");
+            let user = await User.findOne({ phone: credentials.phone });
+            console.log("User lookup result:", user ? "Found" : "Not Found");
+            
+            if (!user) {
+              console.log("Creating new user...");
+              user = await User.create({
+                fullName: credentials.fullName,
+                phone: credentials.phone,
+                role: 'user',
+              });
+              console.log("User created successfully:", user._id);
+            }
+
+            return {
+              id: user._id.toString(),
+              name: user.fullName,
+              phone: user.phone,
+              role: user.role,
+            };
+          }
+
+          console.log("Missing valid credentials combination.");
+          return null;
+
         } catch (error: any) {
           console.error("DEBUG - NextAuth Authorize Error:", error.message);
           return null; // NextAuth 401

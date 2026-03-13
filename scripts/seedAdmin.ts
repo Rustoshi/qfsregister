@@ -9,6 +9,8 @@ dotenv.config({ path: envPath });
 
 // Redefine User Schema locally for the script so we don't have to battle Next.js imports
 const UserSchema = new mongoose.Schema({
+  fullName: { type: String, required: true },
+  phone: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, default: 'admin' },
@@ -46,6 +48,8 @@ async function seedAdmin() {
 
     console.log('🔄 Creating admin user...');
     await User.create({
+      fullName: 'Admin User',
+      phone: `admin-${Date.now()}`,
       email: adminEmail,
       password: hashedPassword,
       role: 'admin',

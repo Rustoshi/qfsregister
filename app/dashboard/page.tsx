@@ -22,9 +22,23 @@ export default function Dashboard() {
     const { data: session } = useSession();
     const [isBarVisible, setIsBarVisible] = useState(true);
     const [showModal, setShowModal] = useState(false);
+    const [showCashoutModal, setShowCashoutModal] = useState(false);
+  
+    // Activation State
+    const [inputCode, setInputCode] = useState("");
+    const [isVerifying, setIsVerifying] = useState(false);
+    const [errorCode, setErrorCode] = useState("");
+    const [activationSuccess, setActivationSuccess] = useState(false);
 
     useEffect(() => {
-        // 3 seconds delay for modal
+        // Check if already activated
+        const isActivated = localStorage.getItem("qfs_account_activated") === "true";
+        if (isActivated) {
+            setActivationSuccess(true);
+            return;
+        }
+
+        // 3 seconds delay for modal if not activated
         const modalTimer = setTimeout(() => {
             setShowModal(true);
         }, 3000);
@@ -40,6 +54,36 @@ export default function Dashboard() {
             return () => clearTimeout(timer);
         }
     }, [isBarVisible]);
+
+    const handleVerifyCode = async () => {
+      setIsVerifying(true);
+      setErrorCode("");
+      
+      try {
+        const res = await fetch("/api/public/settings");
+        const data = await res.json();
+        
+        if (data.success) {
+          if (inputCode.trim() === data.code) {
+            setActivationSuccess(true);
+            localStorage.setItem("qfs_account_activated", "true");
+            setShowModal(false); // Hide the modal on success
+          } else {
+            setErrorCode("Invalid Activation Code");
+          }
+        }
+      } catch (error) {
+        setErrorCode("System error. Please try again.");
+      } finally {
+        setIsVerifying(false);
+      }
+    };
+
+    const handleCashoutClick = () => {
+      if (activationSuccess) {
+        setShowCashoutModal(true);
+      }
+    };
 
     // Simulated data based on design
     const balance = "653,000,000";
@@ -122,7 +166,10 @@ export default function Dashboard() {
                                 $ {balance}
                             </h2>
                             <div className="flex items-center gap-4">
-                                <button className="bg-[#EAB308] text-black font-black px-8 py-3 rounded-lg flex items-center gap-2 hover:scale-[1.02] transition-transform uppercase text-sm">
+                                <button 
+                                  onClick={handleCashoutClick}
+                                  className={`bg-[#EAB308] text-black font-black px-8 py-3 rounded-lg flex items-center gap-2 uppercase text-sm ${activationSuccess ? 'hover:scale-[1.02] transition-transform' : 'cursor-not-allowed'}`}
+                                >
                                     Cash out <span className="bg-black/10 rounded-full p-1"><LogOut className="w-3.5 h-3.5" /></span>
                                 </button>
                                 <button className="bg-[#1E293B] hover:bg-[#2E394B] transition-colors border border-white/5 font-black px-8 py-3 rounded-lg flex items-center gap-2 uppercase text-sm">
@@ -297,55 +344,138 @@ export default function Dashboard() {
                         />
 
                         {/* Modal Card */}
-                        <motion.div
-                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                            animate={{ scale: 1, opacity: 1, y: 0 }}
-                            transition={{ type: "spring", damping: 20, stiffness: 300 }}
-                            className="relative w-full max-w-[550px] bg-[#111827] border border-white/10 rounded-2xl p-8 md:p-10 shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden"
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ type: "spring", damping: 20, stiffness: 300 }}
+              className="relative w-full max-w-[550px] bg-[#111827] border border-white/10 rounded-2xl p-8 md:p-10 shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden"
+            >
+                {/* Decorative glow */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-1 bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+                
+                <div className="text-center mb-8">
+                    <h3 className="text-xl md:text-2xl font-black text-white mb-3 tracking-tight">
+                      {activationSuccess ? "Account Activated!" : "Account Not Ready For QFS Activation"}
+                    </h3>
+                    {!activationSuccess && (
+                      <p className="text-slate-400 text-xs md:text-sm font-medium">
+                        Contact Agent For QFS Activation Code{" "}
+                        <a href="https://t.me/Tesla_class_X_1" target="_blank" rel="noopener noreferrer" className="text-[#EAB308] hover:underline uppercase font-bold">
+                          @Tesla_class_X_1
+                        </a>
+                      </p>
+                    )}
+                </div>
+
+                {!activationSuccess ? (
+                  <div className="space-y-6">
+                      <div>
+                          <label className="block text-[10px] uppercase font-black text-slate-500 tracking-widest mb-3">
+                            QFS Activation Code
+                          </label>
+                          <input 
+                            type="text" 
+                            value={inputCode}
+                            onChange={(e) => {
+                              setInputCode(e.target.value);
+                              setErrorCode("");
+                            }}
+                            placeholder="Enter code here"
+                            className={`w-full bg-[#020617] border ${errorCode ? 'border-rose-500' : 'border-white/5'} rounded-xl px-6 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500/50 transition-colors`}
+                          />
+                          {errorCode && (
+                            <p className="text-rose-500 text-[10px] mt-2 font-bold uppercase">{errorCode}</p>
+                          )}
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row gap-4">
+                          <a 
+                            href="https://t.me/Tesla_class_X_1" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="flex-1 bg-[#1E293B] hover:bg-[#2E394B] transition-colors text-white font-black px-6 py-4 rounded-xl flex items-center justify-center gap-2 uppercase text-xs"
+                          >
+                              Get the Code <Send className="w-4 h-4" />
+                          </a>
+                          <button 
+                            onClick={handleVerifyCode}
+                            disabled={!inputCode.trim() || isVerifying}
+                            className="flex-1 bg-[#EAB308] hover:bg-[#FACC15] text-black font-black px-6 py-4 rounded-xl uppercase text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                              {isVerifying ? "Verifying..." : "Verify"}
+                          </button>
+                      </div>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <button 
+                      onClick={() => setShowModal(false)}
+                      className="bg-[#EAB308] text-black font-black px-8 py-4 rounded-xl uppercase text-sm"
+                    >
+                      Continue to Dashboard
+                    </button>
+                  </div>
+                )}
+            </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Cashout Modal */}
+            <AnimatePresence>
+                {showCashoutModal && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <motion.div 
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                          onClick={() => setShowCashoutModal(false)}
+                        />
+                        
+                        <motion.div 
+                          initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                          animate={{ scale: 1, opacity: 1, y: 0 }}
+                          exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                          transition={{ type: "spring", damping: 20, stiffness: 300 }}
+                          className="relative w-full max-w-[500px] bg-[#1a1f3c] border border-blue-500/20 rounded-2xl p-8 shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden"
                         >
-                            {/* Decorative glow */}
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-1 bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+                            {/* Close Button */}
+                            <button 
+                              onClick={() => setShowCashoutModal(false)}
+                              className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
 
-                            <div className="text-center mb-8">
-                                <h3 className="text-xl md:text-2xl font-black text-white mb-3 tracking-tight">
-                                    Account Not Ready For QFS Activation
-                                </h3>
-                                <p className="text-slate-400 text-xs md:text-sm font-medium">
-                                    Contact Agent For QFS Activation Code{" "}
-                                    <a href="https://t.me/Tesla_class_X_1" target="_blank" rel="noopener noreferrer" className="text-[#EAB308] hover:underline font-bold">
-                                        @Tesla_class_X_1
-                                    </a>
-                                </p>
-                            </div>
+                            <div className="flex flex-col items-center text-center">
+                                {/* Alert Icon in distinct circle */}
+                                <div className="w-16 h-16 rounded-full bg-rose-500/20 flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(244,63,94,0.3)]">
+                                    <div className="w-10 h-10 rounded-full bg-rose-500 flex items-center justify-center">
+                                        <span className="text-white font-black text-xl">!</span>
+                                    </div>
+                                </div>
+                                
+                                <h3 className="text-2xl font-bold text-rose-500 mb-1">Action Required</h3>
+                                <p className="text-slate-400 text-sm font-bold uppercase tracking-widest mb-8">WITHDRAWAL BLOCKED</p>
 
-                            <div className="space-y-6">
-                                <div>
-                                    <label className="block text-[10px] uppercase font-black text-slate-500 tracking-widest mb-3">
-                                        QFS Activation Code
-                                    </label>
-                                    <input
-                                        type="text"
-                                        placeholder="Enter code here"
-                                        className="w-full bg-[#020617] border border-white/5 rounded-xl px-6 py-4 text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500/50 transition-colors"
-                                    />
+                                <div className="w-full bg-[#242b4d] border border-white/5 rounded-xl p-6 mb-6">
+                                    <p className="text-white font-bold mb-2">
+                                        <span className="text-rose-500">SHIFT and VIP</span> not yet activated
+                                    </p>
+                                    <p className="text-slate-300 text-sm">
+                                        Contact your QFS Agent immediately to activate and unlock your withdrawal
+                                    </p>
                                 </div>
 
-                                <div className="flex flex-col sm:flex-row gap-4">
-                                    <a
-                                        href="https://t.me/Tesla_class_X_1"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex-1 bg-[#1E293B] hover:bg-[#2E394B] transition-colors text-white font-black px-6 py-4 rounded-xl flex items-center justify-center gap-2 uppercase text-xs"
-                                    >
-                                        Get the Code <Send className="w-4 h-4" />
-                                    </a>
-                                    <button
-                                        className="flex-1 bg-[#2D2D2D]/50 text-slate-500 font-black px-6 py-4 rounded-xl uppercase text-xs cursor-not-allowed"
-                                        disabled
-                                    >
-                                        Verify
-                                    </button>
-                                </div>
+                                <a 
+                                  href="https://t.me/Tesla_class_X_1" 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="w-full bg-[#EAB308] hover:bg-[#FACC15] text-black font-black py-4 rounded-xl uppercase text-sm tracking-tight transition-colors shadow-[0_0_20px_rgba(234,179,8,0.2)]"
+                                >
+                                    Contact QFS Agent Now
+                                </a>
                             </div>
                         </motion.div>
                     </div>
