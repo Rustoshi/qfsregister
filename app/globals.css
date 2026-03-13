@@ -1,26 +1,110 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #020617;
+  --foreground: #ffffff;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-space-grotesk);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Subtle noise texture */
+.noise-bg {
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  z-index: 0;
+}
+
+/* Radial Glow behind the card */
+.radial-glow {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(34,197,94,0.15) 0%, rgba(2,6,23,0) 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Animated Grid Background */
+.grid-bg {
+  position: absolute;
+  inset: 0;
+  background-size: 50px 50px;
+  background-image: 
+    linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+  mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+  z-index: 0;
+}
+
+/* React International Phone Customization for Dark Fintech Theme */
+.react-international-phone-input-container .react-international-phone-country-selector-button {
+  background-color: transparent !important;
+  border: none !important;
+  border-right: 1px solid #1E293B !important;
+  height: 48px !important;
+  padding: 0 12px !important;
+}
+
+.react-international-phone-input-container .react-international-phone-input {
+  background-color: transparent !important;
+  border: none !important;
+  color: white !important;
+  height: 48px !important;
+  width: 100% !important;
+  padding-left: 12px !important;
+  font-size: 16px !important;
+}
+
+.react-international-phone-input-container {
+  background-color: #020617 !important;
+  border: 1px solid #1E293B !important;
+  border-radius: 10px !important;
+  overflow: hidden !important;
+  transition: all 0.2s ease;
+}
+
+.react-international-phone-input-container:focus-within {
+  border-color: #22C55E !important;
+  box-shadow: 0 0 0 1px rgba(34,197,94,0.5) !important;
+}
+
+/* Dropdown styling overriding */
+.react-international-phone-country-selector-dropdown {
+  background-color: #0F172A !important;
+  border: 1px solid #1E293B !important;
+  color: white !important;
+  min-width: 280px !important;
+  max-height: 300px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+  border-radius: 12px !important;
+  padding: 8px 0 !important;
+  z-index: 100 !important;
+}
+
+.react-international-phone-country-selector-dropdown__list-item {
+  padding: 10px 16px !important;
+  font-size: 14px !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.react-international-phone-country-selector-dropdown__list-item:hover,
+.react-international-phone-country-selector-dropdown__list-item--focused {
+  background-color: #1E293B !important;
 }
