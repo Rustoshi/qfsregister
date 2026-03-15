@@ -82,65 +82,65 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#020617] text-white p-4 md:p-8 font-sans">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen bg-[#020617] text-white px-4 py-5 sm:p-6 md:p-8 font-sans">
+      <div className="max-w-6xl mx-auto space-y-5 sm:space-y-6 md:space-y-8">
         
         {/* Header */}
-        <header className="flex flex-wrap items-center justify-between gap-4 bg-[#111827] border border-white/10 rounded-2xl p-6">
-          <div className="flex items-center gap-4">
-            <div className="bg-[#1E293B] p-3 rounded-xl text-[#EAB308]">
-              <Settings className="w-6 h-6" />
+        <header className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 bg-[#111827] border border-white/10 rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="bg-[#1E293B] p-2.5 sm:p-3 rounded-lg sm:rounded-xl text-[#EAB308]">
+              <Settings className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div>
-              <h1 className="text-xl font-black uppercase tracking-tight">Admin Dashboard</h1>
-              <p className="text-slate-500 text-xs font-bold uppercase">System Management Panel</p>
+              <h1 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-tight">Admin Dashboard</h1>
+              <p className="text-slate-500 text-[10px] sm:text-xs font-bold uppercase">System Management Panel</p>
             </div>
           </div>
           <button 
             onClick={() => signOut({ callbackUrl: '/admin/login' })}
-            className="flex items-center gap-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 transition-colors px-4 py-2 rounded-lg font-bold uppercase text-xs"
+            className="flex items-center gap-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 transition-colors px-3 sm:px-4 py-2.5 rounded-lg font-bold uppercase text-[11px] sm:text-xs"
           >
             <LogOut className="w-4 h-4" /> Logout
           </button>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6 md:gap-8">
           
           {/* Main Area: User List */}
-          <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center gap-2 mb-4">
-              <Users className="w-5 h-5 text-[#EAB308]" />
-              <h2 className="text-lg font-black uppercase tracking-tight">Registered Users ({users.length})</h2>
+          <div className="lg:col-span-2 space-y-3 sm:space-y-4">
+            <div className="flex items-center gap-2">
+              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-[#EAB308]" />
+              <h2 className="text-sm sm:text-base md:text-lg font-black uppercase tracking-tight">Registered Users ({users.length})</h2>
             </div>
             
-            <div className="bg-[#111827] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+            <div className="bg-[#111827] border border-white/10 rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl">
               {loadingUsers ? (
-                <div className="p-12 flex justify-center">
+                <div className="p-8 sm:p-12 flex justify-center">
                   <Loader2 className="w-6 h-6 animate-spin text-slate-500" />
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm">
-                    <thead className="bg-[#1E293B] text-slate-400 text-[10px] uppercase font-black tracking-widest">
+                  <table className="w-full text-left text-xs sm:text-sm">
+                    <thead className="bg-[#1E293B] text-slate-400 text-[10px] sm:text-[11px] uppercase font-black tracking-widest">
                       <tr>
-                        <th className="px-6 py-4">Full Name</th>
-                        <th className="px-6 py-4">Phone Number</th>
-                        <th className="px-6 py-4 text-right">Joined Date</th>
+                        <th className="px-4 sm:px-6 py-3 sm:py-4">Full Name</th>
+                        <th className="px-4 sm:px-6 py-3 sm:py-4">Phone Number</th>
+                        <th className="px-4 sm:px-6 py-3 sm:py-4 text-right">Joined</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
                       {users.length === 0 ? (
                         <tr>
-                          <td colSpan={3} className="px-6 py-12 text-center text-slate-500 font-medium">
+                          <td colSpan={3} className="px-4 sm:px-6 py-8 sm:py-12 text-center text-slate-500 font-medium text-sm">
                             No users registered yet.
                           </td>
                         </tr>
                       ) : (
                         users.map((u) => (
                           <tr key={u._id} className="hover:bg-white/[0.02] transition-colors">
-                            <td className="px-6 py-4 font-bold">{u.fullName}</td>
-                            <td className="px-6 py-4 text-slate-300 font-mono text-xs">{u.phone}</td>
-                            <td className="px-6 py-4 text-right text-slate-500 text-xs">
+                            <td className="px-4 sm:px-6 py-3 sm:py-4 font-bold text-xs sm:text-sm">{u.fullName}</td>
+                            <td className="px-4 sm:px-6 py-3 sm:py-4 text-slate-300 font-mono text-[10px] sm:text-xs">{u.phone}</td>
+                            <td className="px-4 sm:px-6 py-3 sm:py-4 text-right text-slate-500 text-[10px] sm:text-xs">
                               {new Date(u.createdAt).toLocaleDateString()}
                             </td>
                           </tr>
@@ -154,21 +154,21 @@ export default function AdminDashboard() {
           </div>
 
           {/* Sidebar Area: Settings */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 mb-4">
-              <Settings className="w-5 h-5 text-[#EAB308]" />
-              <h2 className="text-lg font-black uppercase tracking-tight">System Configuration</h2>
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex items-center gap-2">
+              <Settings className="w-4 h-4 sm:w-5 sm:h-5 text-[#EAB308]" />
+              <h2 className="text-sm sm:text-base md:text-lg font-black uppercase tracking-tight">System Configuration</h2>
             </div>
 
-            <div className="bg-[#111827] border border-white/10 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+            <div className="bg-[#111827] border border-white/10 rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 shadow-2xl relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-[50px] rounded-full" />
               
-              <form onSubmit={handleSaveSettings} className="relative z-10 space-y-6">
+              <form onSubmit={handleSaveSettings} className="relative z-10 space-y-4 sm:space-y-5 md:space-y-6">
                 <div>
-                  <label className="block text-[10px] uppercase font-black tracking-widest text-slate-500 mb-3">
+                  <label className="block text-[10px] sm:text-[11px] uppercase font-black tracking-widest text-slate-500 mb-2 sm:mb-3">
                     Global QFS Activation Code
                   </label>
-                  <p className="text-xs text-slate-400 mb-4 font-medium leading-relaxed">
+                  <p className="text-[11px] sm:text-xs text-slate-400 mb-3 sm:mb-4 font-medium leading-relaxed">
                     This is the code users must provide to pass the activation gate on their dashboard.
                   </p>
                   <input
@@ -176,7 +176,7 @@ export default function AdminDashboard() {
                     required
                     value={activationCode}
                     onChange={(e) => setActivationCode(e.target.value)}
-                    className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#EAB308]/50 transition-colors font-mono"
+                    className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-3 sm:py-3.5 text-sm sm:text-base text-white focus:outline-none focus:border-[#EAB308]/50 transition-colors font-mono"
                     placeholder="Enter activation code"
                   />
                 </div>
@@ -184,7 +184,7 @@ export default function AdminDashboard() {
                 <button
                   type="submit"
                   disabled={savingCode}
-                  className="w-full bg-[#EAB308] hover:bg-[#FACC15] text-black font-black py-4 rounded-xl uppercase text-xs tracking-tight transition-colors disabled:opacity-70 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(234,179,8,0.2)]"
+                  className="w-full bg-[#EAB308] hover:bg-[#FACC15] text-black font-black py-3.5 sm:py-4 rounded-xl uppercase text-[11px] sm:text-xs tracking-tight transition-colors disabled:opacity-70 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(234,179,8,0.2)]"
                 >
                   {savingCode ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                   {savingCode ? "Saving..." : "Update Settings"}
