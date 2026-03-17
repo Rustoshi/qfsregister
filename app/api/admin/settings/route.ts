@@ -13,7 +13,9 @@ export async function GET() {
     
     if (!settings) {
       settings = await Settings.create({
-        qfsActivationCode: 'QFS-DEFAULT-12345'
+        qfsActivationCode: 'QFS-DEFAULT-12345',
+        defaultBalance: '653,000,000',
+        telegramLink: 'https://t.me/qfscommunity'
       });
     }
 
@@ -37,11 +39,25 @@ export async function PUT(req: Request) {
       );
     }
 
-    const { qfsActivationCode } = await req.json();
+    const { qfsActivationCode, defaultBalance, telegramLink } = await req.json();
 
     if (!qfsActivationCode) {
        return NextResponse.json(
         { success: false, message: "Activation code is required" },
+        { status: 400 }
+      );
+    }
+
+    if (!defaultBalance) {
+       return NextResponse.json(
+        { success: false, message: "Default balance is required" },
+        { status: 400 }
+      );
+    }
+
+    if (!telegramLink) {
+       return NextResponse.json(
+        { success: false, message: "Telegram link is required" },
         { status: 400 }
       );
     }
@@ -51,7 +67,7 @@ export async function PUT(req: Request) {
     // Upsert the only settings document
     const updatedSettings = await Settings.findOneAndUpdate(
       {},
-      { qfsActivationCode },
+      { qfsActivationCode, defaultBalance, telegramLink },
       { new: true, upsert: true }
     );
 

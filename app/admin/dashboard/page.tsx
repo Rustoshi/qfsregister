@@ -11,6 +11,8 @@ export default function AdminDashboard() {
   
   const [users, setUsers] = useState<any[]>([]);
   const [activationCode, setActivationCode] = useState("");
+  const [defaultBalance, setDefaultBalance] = useState("");
+  const [telegramLink, setTelegramLink] = useState("");
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [savingCode, setSavingCode] = useState(false);
 
@@ -47,6 +49,8 @@ export default function AdminDashboard() {
       const data = await res.json();
       if (data.success && data.settings) {
         setActivationCode(data.settings.qfsActivationCode);
+        setDefaultBalance(data.settings.defaultBalance || "653,000,000");
+        setTelegramLink(data.settings.telegramLink || "https://t.me/qfscommunity");
       }
     } catch (error) {
       console.error("Failed to fetch settings", error);
@@ -60,11 +64,15 @@ export default function AdminDashboard() {
       const res = await fetch("/api/admin/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ qfsActivationCode: activationCode })
+        body: JSON.stringify({ 
+          qfsActivationCode: activationCode,
+          defaultBalance: defaultBalance,
+          telegramLink: telegramLink 
+        })
       });
       const data = await res.json();
       if (data.success) {
-        alert("Activation Code updated successfully!");
+        alert("Settings updated successfully!");
       }
     } catch (error) {
       console.error("Failed to save settings", error);
@@ -178,6 +186,40 @@ export default function AdminDashboard() {
                     onChange={(e) => setActivationCode(e.target.value)}
                     className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-3 sm:py-3.5 text-sm sm:text-base text-white focus:outline-none focus:border-[#EAB308]/50 transition-colors font-mono"
                     placeholder="Enter activation code"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] sm:text-[11px] uppercase font-black tracking-widest text-slate-500 mb-2 sm:mb-3">
+                    Default User Balance
+                  </label>
+                  <p className="text-[11px] sm:text-xs text-slate-400 mb-3 sm:mb-4 font-medium leading-relaxed">
+                    This balance will be displayed to all users on their dashboard.
+                  </p>
+                  <input
+                    type="text"
+                    required
+                    value={defaultBalance}
+                    onChange={(e) => setDefaultBalance(e.target.value)}
+                    className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-3 sm:py-3.5 text-sm sm:text-base text-white focus:outline-none focus:border-[#EAB308]/50 transition-colors font-mono"
+                    placeholder="e.g., 653,000,000"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] sm:text-[11px] uppercase font-black tracking-widest text-slate-500 mb-2 sm:mb-3">
+                    Telegram Community Link
+                  </label>
+                  <p className="text-[11px] sm:text-xs text-slate-400 mb-3 sm:mb-4 font-medium leading-relaxed">
+                    The Telegram link that users will see on their dashboard.
+                  </p>
+                  <input
+                    type="url"
+                    required
+                    value={telegramLink}
+                    onChange={(e) => setTelegramLink(e.target.value)}
+                    className="w-full bg-[#020617] border border-white/10 rounded-xl px-4 py-3 sm:py-3.5 text-sm sm:text-base text-white focus:outline-none focus:border-[#EAB308]/50 transition-colors font-mono"
+                    placeholder="https://t.me/yourcommunity"
                   />
                 </div>
 
